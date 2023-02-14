@@ -5,6 +5,7 @@ import javafx.scene.canvas.GraphicsContext;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,24 +26,7 @@ public class Fractals  {
 
     private void paint() {
 
-        int iterType = -2;
-
         List<Line2D> figure = new ArrayList<>();
-
-        switch (flags.iterType) {
-            case "All" -> {
-                iterType = -1;
-                break;
-            }
-            case "Even" -> {
-                iterType = 0;
-                break;
-            }
-            case "Odd" -> {
-                iterType = 1;
-                break;
-            }
-        }
 
         switch (flags.pattern) {
             case "Line" -> {
@@ -72,6 +56,16 @@ public class Fractals  {
                 double p3x = pmx + (h * (p1y - pmy)) / (a / 2);
                 double p3y = pmy + (h * (p1x - pmx)) / (a / 2);
 
+                if (flags.sidesToMod[0] == 1) {     //left
+                    figure.add(new Line2D.Double(p1x, p1y, p2x, p2y));
+                }
+                if (flags.sidesToMod[1] == 1) {     //right
+                    figure.add(new Line2D.Double(p2x, p2y, p3x, p3y));
+                }
+                if (flags.sidesToMod[2] == 1) {     //down
+                    figure.add(new Line2D.Double(p3x, p3y, p1x, p1y));
+                }
+
                 figure.addAll(
                         List.of(
                                 new Line2D.Double(p1x, p1y, p2x, p2y),
@@ -99,25 +93,55 @@ public class Fractals  {
 
                 if (flags.dFlag) {
 
-                    figure.addAll(
-                            List.of(
-                                    new Line2D.Double(px1, py1, px2, py2),
-                                    new Line2D.Double(px2, py2, px3, py3),
-                                    new Line2D.Double(px3, py3, px4, py4),
-                                    new Line2D.Double(px4, py4, px1, py1)
-                                    )
-                    );
+                    if (flags.sidesToMod[3] == 1) {     //up
+                        figure.add(new Line2D.Double(px1, py1, px2, py2));
+                    } else {
+                        drawLine(new Line2D.Double(px1, py1, px2, py2));
+                    }
+
+                    if (flags.sidesToMod[1] == 1) {     //right
+                        figure.add(new Line2D.Double(px2, py2, px3, py3));
+                    } else {
+                        drawLine(new Line2D.Double(px2, py2, px3, py3));
+                    }
+
+                    if (flags.sidesToMod[2] == 1) {     //down
+                        figure.add(new Line2D.Double(px3, py3, px4, py4));
+                    } else {
+                        drawLine(new Line2D.Double(px3, py3, px4, py4));
+                    }
+
+                    if (flags.sidesToMod[0] == 1) {     //left
+                        figure.add(new Line2D.Double(px4, py4, px1, py1));
+                    } else {
+                        drawLine(new Line2D.Double(px4, py4, px1, py1));
+                    }
 
                 } else {
 
-                    figure.addAll(
-                            List.of(
-                                    new Line2D.Double(px2, py2, px1, py1),
-                                    new Line2D.Double(px3, py3, px2, py2),
-                                    new Line2D.Double(px4, py4, px3, py3),
-                                    new Line2D.Double(px1, py1, px4, py4)
-                            )
-                    );
+                    if (flags.sidesToMod[3] == 1) {     //up
+                        figure.add(new Line2D.Double(px2, py2, px1, py1));
+                    } else {
+                        drawLine(new Line2D.Double(px2, py2, px1, py1));
+                    }
+
+                    if (flags.sidesToMod[1] == 1) {     //right
+                        figure.add(new Line2D.Double(px3, py3, px2, py2));
+                    } else {
+                        drawLine(new Line2D.Double(px3, py3, px2, py2));
+                    }
+
+                    if (flags.sidesToMod[2] == 1) {     //down
+                        figure.add(new Line2D.Double(px4, py4, px3, py3));
+                    } else {
+                        drawLine(new Line2D.Double(px4, py4, px3, py3));
+                    }
+
+                    if (flags.sidesToMod[0] == 1) {     //left
+                        figure.add(new Line2D.Double(px1, py1, px4, py4));
+                    } else {
+                        drawLine(new Line2D.Double(px1, py1, px4, py4));
+                    }
                 }
             }
         }
@@ -158,6 +182,10 @@ public class Fractals  {
                 }
             }
 
+            if ((lines.size() == 1) && temp1.isEmpty()) {
+                drawLine(lines.get(0));
+            }
+
             lines = temp1;
         }
 
@@ -168,7 +196,7 @@ public class Fractals  {
 
         double a = line.getP1().distance(line.getP2());
         a = a / 3;
-        //g2.drawString(String.valueOf(a), 10, Integer.parseInt(String.valueOf(Math.round(10+(i*10)))));
+
         double h = Math.sqrt(Math.pow(a, 2) - Math.pow((a / 2), 2) / 4);
 
         Point2D ps = line.getP1();
